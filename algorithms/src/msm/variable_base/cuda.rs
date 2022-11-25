@@ -310,7 +310,12 @@ fn initialize_cuda_request_handler(input: crossbeam_channel::Receiver<CudaReques
 lazy_static::lazy_static! {
     static ref CUDA_DISPATCH: crossbeam_channel::Sender<CudaRequest> = {
         let (sender, receiver) = crossbeam_channel::bounded(4096);
-        std::thread::spawn(move || initialize_cuda_request_handler(receiver));
+        // std::thread::spawn(move || initialize_cuda_request_handler(receiver));
+        for _ in 0..10{
+            let recv = receiver.clone();
+            std::thread::spawn(move || initialize_cuda_request_handler(recv));
+        }
+
         sender
     };
 }
